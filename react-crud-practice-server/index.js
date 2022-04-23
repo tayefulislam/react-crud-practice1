@@ -1,6 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config()
+require('dotenv').config();
+
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
 
 const app = express()
 const port = process.env.PORT || 5000;
@@ -15,7 +18,7 @@ app.use(express.json())
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.fgmis.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
@@ -37,7 +40,7 @@ async function run() {
             const query = {}
             const cursor = productCollections.find(query)
             const result = await cursor.toArray()
-            console.log(result)
+            // console.log(result)
             res.send(result)
         })
 
@@ -52,6 +55,61 @@ async function run() {
 
             res.send(result)
         })
+
+        // delet data 
+        app.delete('/delete/:id', async (req, res) => {
+
+            const id = req.params.id;
+
+            const query = { _id: ObjectId(id) }
+
+            const result = await productCollections.deleteOne(query)
+            res.send(result)
+
+        })
+
+        // udpate 
+
+
+        app.put('/update/:id', async (req, res) => {
+
+            const id = req.params.id;
+            const product = req.body;
+
+            const filter = { _id: ObjectId(id) };
+
+            const options = { upsert: true }
+
+            const updateProduct = { $set: product }
+
+            const result = await productCollections.updateOne(filter, updateProduct, options);
+
+            res.send(result)
+
+            // console.log(filter)
+
+
+
+        })
+
+
+        // find one 
+
+
+
+        app.get('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id)
+
+            const query = { _id: ObjectId(id) }
+
+            const result = await productCollections.findOne(query);
+
+            console.log(result)
+            res.send(result)
+        })
+
+
 
     }
 

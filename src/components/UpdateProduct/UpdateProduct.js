@@ -1,10 +1,29 @@
-import React from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import React, { useEffect, useState } from 'react';
 
-const AddProducts = () => {
+import { ToastContainer, toast } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
+
+import { useParams } from 'react-router-dom';
+
+import useProduct from '../hooks/useProduct';
 
 
-    const handleSubmit = (event) => {
+
+const UpdateProduct = () => {
+
+    const id = useParams()
+
+
+
+    // get prodcut using hook
+    const product = useProduct(id)
+
+
+    console.log(product)
+
+
+    const handleUpdate = (event) => {
 
         event.preventDefault()
 
@@ -17,8 +36,8 @@ const AddProducts = () => {
 
         console.log(product)
 
-        fetch('http://localhost:5000/product/add', {
-            method: 'POST',
+        fetch(`http://localhost:5000/update/${id.id}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -28,46 +47,33 @@ const AddProducts = () => {
             .then(res => res.json())
             .then(data => {
                 console.log(data)
-                if (data.acknowledged) {
-
-                    event.target.reset()
-                }
-
-
-
-
+                toast('Info updated')
 
             })
 
 
-
-
-
     }
-
-
-
 
     return (
         <div className='w-50 mx-auto'>
 
-            <h1 className='text-center'>Add Product </h1>
+            <h1 className='text-center'> Update Product </h1>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleUpdate}>
                 <div className="mb-3">
                     <label className="form-label">Product Name</label>
-                    <input type="text" name='name' required className="form-control" aria-describedby="emailHelp" />
+                    <input type="text" name='name' defaultValue={product.name} required className="form-control" aria-describedby="emailHelp" />
 
                 </div>
 
                 <div className="mb-3">
                     <label className="form-label">Price</label>
-                    <input type="number" name='price' required className="form-control" />
+                    <input type="number" name='price' defaultValue={product.price} required className="form-control" />
                 </div>
 
                 <div className="mb-3">
                     <label className="form-label">Quantity</label>
-                    <input type="number" name='quantity' required className="form-control" />
+                    <input type="number" name='quantity' defaultValue={product.quantity} required className="form-control" />
                 </div>
 
 
@@ -76,14 +82,17 @@ const AddProducts = () => {
 
                     <label className="form-label">Image Url</label>
 
-                    <input type="text" name='img' className="form-control" />
+                    <input type="text" name='img' className="form-control" defaultValue={product.img} />
                 </div>
 
                 <button type="submit" className="btn btn-primary">Add</button>
             </form>
 
+
+            <ToastContainer></ToastContainer>
+
         </div>
     );
 };
 
-export default AddProducts;
+export default UpdateProduct;
